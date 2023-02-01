@@ -1,16 +1,93 @@
-# This is a sample Python script.
+import numpy as np
+import matplotlib.pyplot as plt
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+limit = 11
+step = 0.01
+color = 'r'
+increase_high = False
+change_func = {-limit: 'inc'}
+func_line = '-'
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def switch_color():
+    global color
+    if color == 'r':
+        color = 'b'
+    else:
+        color = 'r'
+    return color
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def switch_line():
+    global func_line
+    if func_line == '-':
+        func_line = '-.'
+    else:
+        func_line = '-'
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+x = np.arange(-limit, limit, step)
+
+a, b, c, d, e = -12, -18, 5, 10, -30
+
+
+def f(x):
+    func = a * x ** 4 * np.sin(np.cos(x)) - b * x ** 3 + c * x ** 2 + d * x + e
+    return func
+
+
+y_min = min(np.round(f(x), 2))
+
+x_min = 0
+f_min = f(-limit)
+
+for x_cur in x:
+    if f(x_cur) < f_min:
+        f_min = np.round(f(x_cur), 2)
+        x_min = np.round(x_cur, 2)
+
+print(x_min, f_min)
+
+for i in range(len(x) - 1):
+    if (f(x[i]) > 0 > f(x[i + 1])) or (f(x[i]) < 0 < f(x[i + 1])):
+       change_func[x[i]] = 'zero'
+    if increase_high:
+        if f(x[i]) < f(x[i + 1]):
+            increase_high = False
+            change_func[x[i]] = 'inc'
+    else:
+        if f(x[i]) > f(x[i + 1]):
+            increase_high = True
+            change_func[x[i]] = 'inc'
+
+
+# for i in range(len(x) - 1):
+#     if (f(x[i]) > 0 > f(x[i + 1])) or (f(x[i]) < 0 < f(x[i + 1])):
+#         change_func.append((x[i], 'zero'))
+
+change_func[limit] = 'inc'
+x_list = [key for key in change_func]
+
+print(change_func)
+
+for i in range(len(x_list) - 1):
+    x_cur = np.arange(x_list[i], x_list[i + 1], step)
+    if change_func.get(x_list[i]) == 'zero':
+        plt.plot(x_list[i], f(x_list[i]), 'gx')
+        switch_line()
+    elif change_func.get(x_list[i]) == 'inc':
+        switch_color()
+    plt.rcParams['lines.linestyle'] = func_line
+    plt.plot(x_cur, f(x_cur), color)
+
+ax = plt.gca()
+ax.spines['left'].set_position("center")
+ax.spines['bottom'].set_position('center')
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+ax.set_xlabel("X", fontsize=15, color='blue')
+ax.set_ylabel("Y", fontsize=15, color='orange')
+
+
+plt.show()
